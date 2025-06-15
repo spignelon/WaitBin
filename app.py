@@ -60,6 +60,16 @@ def load_user(user_id):
 def generate_edit_code():
     return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
 
+def check_edit_permission(waitbin, edit_code=None):
+    """Check if current user can edit the waitbin"""
+    # If user is logged in and owns the waitbin
+    if current_user.is_authenticated and waitbin.get('user_id') == ObjectId(current_user.id):
+        return True
+    # If edit code matches
+    if edit_code and waitbin.get('edit_code') == edit_code:
+        return True
+    return False
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -132,12 +142,6 @@ def view_waitbin(waitbin_id):
 
 @app.route('/edit/<waitbin_id>')
 def edit_form(waitbin_id):
-    return render_template('edit_form.html', waitbin_id=waitbin_id)
-
-@app.route('/edit/<waitbin_id>', methods=['POST'])
-def edit_waitbin(waitbin_id):
-    edit_code = request.form.get('edit_code')
-    
     try:
         waitbin = waitbins_collection.find_one({'_id': ObjectId(waitbin_id)})
     except:
@@ -146,25 +150,38 @@ def edit_waitbin(waitbin_id):
     if not waitbin:
         abort(404)
     
-    # Check if user has permission to edit
-    can_edit = False
-    
-    # First check if the user owns this waitbin (logged in and created it)
+    # If user owns the waitbin, go directly to edit
     if current_user.is_authenticated and waitbin.get('user_id') == ObjectId(current_user.id):
-        can_edit = True
-    # If not owned by user, check edit code (works for both logged in and anonymous users)
-    elif edit_code and waitbin.get('edit_code') == edit_code:
-        can_edit = True
-    # If no edit code provided, show the edit form (don't fail immediately)
-    elif not edit_code:
-        return render_template('edit_form.html', waitbin_id=waitbin_id)
+        return render_template('edit.html', waitbin=waitbin, user_owns=True)
     
-    if not can_edit:
+    # Otherwise, show edit code form
+    return render_template('edit_form.html', waitbin_id=waitbin_id)
+
+@app.route('/edit/<waitbin_id>', methods=['POST'])
+def edit_waitbin(waitbin_id):
+    try:
+        waitbin = waitbins_collection.find_one({'_id': ObjectId(waitbin_id)})
+    except:
+        abort(404)
+    
+    if not waitbin:
+        abort(404)
+    
+    edit_code = request.form.get('edit_code')
+    
+    # Check if this is the verification step (user entering edit code)
+    if request.form.get('action') == 'edit':
+        if not check_edit_permission(waitbin, edit_code):
+            flash('Invalid edit code!', 'error')
+            return render_template('edit_form.html', waitbin_id=waitbin_id)
+        
+        # Pass the edit code to the edit template so it can be included in the update form
+        return render_template('edit.html', waitbin=waitbin, edit_code=edit_code, user_owns=False)
+    
+    # This is the actual update step
+    if not check_edit_permission(waitbin, edit_code):
         flash('Invalid edit code!', 'error')
         return render_template('edit_form.html', waitbin_id=waitbin_id)
-    
-    if request.form.get('action') == 'edit':
-        return render_template('edit.html', waitbin=waitbin)
     
     # Update waitbin
     title = request.form.get('title', waitbin['title'])
@@ -179,7 +196,7 @@ def edit_waitbin(waitbin_id):
             unlock_datetime = unlock_datetime.replace(tzinfo=timezone.utc)
         except ValueError:
             flash('Invalid date or time format!', 'error')
-            return render_template('edit.html', waitbin=waitbin)
+            return render_template('edit.html', waitbin=waitbin, edit_code=edit_code)
         
         waitbins_collection.update_one(
             {'_id': ObjectId(waitbin_id)},

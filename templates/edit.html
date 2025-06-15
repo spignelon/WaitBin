@@ -7,6 +7,11 @@
     <h1 class="text-3xl font-bold mb-8 text-center">Edit WaitBin</h1>
     
     <form method="POST" class="space-y-6">
+        <!-- Include edit code as hidden field if user doesn't own the waitbin -->
+        {% if not user_owns and edit_code %}
+            <input type="hidden" name="edit_code" value="{{ edit_code }}" />
+        {% endif %}
+        
         <div class="form-control">
             <label class="label">
                 <span class="label-text">Title</span>
