@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}{{ waitbin.title or 'WaitBin' }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    {% if is_unlocked %}
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h1 class="card-title text-2xl mb-4">
+                    {{ waitbin.title or 'Untitled WaitBin' }}
+                </h1>
+                
+                <div class="bg-base-200 p-4 rounded-lg">
+                    <pre class="whitespace-pre-wrap font-mono text-sm">{{ waitbin.content }}</pre>
+                </div>
+                
+                <div class="card-actions justify-between mt-6">
+                    <div class="text-sm opacity-70">
+                        Created: {{ waitbin.created_at.strftime('%Y-%m-%d %H:%M UTC') }}
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn btn-outline btn-sm" onclick="copyContent()">
+                            Copy Content
+                        </button>
+                        <a href="{{ url_for('edit_form', waitbin_id=waitbin._id) }}" 
+                           class="btn btn-primary btn-sm">
+                            Edit
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body text-center">
+                <h1 class="card-title text-2xl mb-4 justify-center">
+                    🔒 {{ waitbin.title or 'WaitBin Locked' }}
+                </h1>
+                
+                <p class="text-lg mb-6 opacity-80">
+                    This WaitBin will unlock on:
+                </p>
+                
+                <div class="text-3xl font-bold mb-6">
+                    {{ waitbin.unlock_datetime.strftime('%B %d, %Y at %H:%M UTC') }}
+                </div>
+                
+                <div class="grid grid-cols-4 gap-4 max-w-md mx-auto mb-6">
+                    <div class="bg-base-200 p-4 rounded-lg">
+                        <div class="text-2xl font-bold" id="days">--</div>
+                        <div class="text-sm opacity-70">Days</div>
+                    </div>
+                    <div class="bg-base-200 p-4 rounded-lg">
+                        <div class="text-2xl font-bold" id="hours">--</div>
+                        <div class="text-sm opacity-70">Hours</div>
+                    </div>
+                    <div class="bg-base-200 p-4 rounded-lg">
+                        <div class="text-2xl font-bold" id="minutes">--</div>
+                        <div class="text-sm opacity-70">Minutes</div>
+                    </div>
+                    <div class="bg-base-200 p-4 rounded-lg">
+                        <div class="text-2xl font-bold" id="seconds">--</div>
+                        <div class="text-sm opacity-70">Seconds</div>
+                    </div>
+                </div>
+                
+                <div class="text-sm opacity-70 mb-4">
+                    Created: {{ waitbin.created_at.strftime('%Y-%m-%d %H:%M UTC') }}
+                </div>
+                
+                <a href="{{ url_for('edit_form', waitbin_id=waitbin._id) }}" 
+                   class="btn btn-outline">
+                    Edit WaitBin
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+{% if is_unlocked %}
+function copyContent() {
+    const content = {{ waitbin.content | tojson }};
+    navigator.clipboard.writeText(content).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => {
+            btn.textContent = originalText;
+        }, 2000);
+    });
+}
+{% else %}
+function updateCountdown() {
+    fetch(`/api/time-remaining/{{ waitbin._id }}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.unlocked) {
+                location.reload();
+                return;
+            }
+            
+            const seconds = data.seconds_remaining;
+            const days = Math.floor(seconds / (24 * 60 * 60));
+            const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
+            const minutes = Math.floor((seconds % (60 * 60)) / 60);
+            const secs = seconds % 60;
+            
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = secs;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Update countdown every second
+updateCountdown();
+setInterval(updateCountdown, 1000);
+{% endif %}
+</script>
+{% endblock %}

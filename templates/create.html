@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Create WaitBin{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8 text-center">Create New WaitBin</h1>
+    
+    <form method="POST" class="space-y-6">
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Title (optional)</span>
+            </label>
+            <input type="text" name="title" placeholder="Enter a title for your WaitBin" 
+                   class="input input-bordered w-full" />
+        </div>
+        
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Content *</span>
+            </label>
+            <textarea name="content" placeholder="Enter your content here..." 
+                      class="textarea textarea-bordered h-32 w-full" required></textarea>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Unlock Date *</span>
+                </label>
+                <input type="date" name="unlock_date" class="input input-bordered w-full" 
+                       min="{{ datetime.now().date().isoformat() }}" required />
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Unlock Time</span>
+                </label>
+                <input type="time" name="unlock_time" class="input input-bordered w-full" 
+                       value="00:00" />
+            </div>
+        </div>
+        
+        <div class="form-control mt-8">
+            <button type="submit" class="btn btn-primary btn-lg w-full">
+                Create WaitBin
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

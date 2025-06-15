@@ -1,0 +1,5 @@
+.env
+venv/
+waitbin-app.zip
+__pycache__/
+

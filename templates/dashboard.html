@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - WaitBin{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Your WaitBins</h1>
+        <a href="{{ url_for('create') }}" class="btn btn-primary">Create New</a>
+    </div>
+    
+    {% if waitbins %}
+        <div class="grid gap-6">
+            {% for waitbin in waitbins %}
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h2 class="card-title">
+                                {{ waitbin.title or 'Untitled WaitBin' }}
+                                {% set unlock_dt = waitbin.unlock_datetime | ensure_tz %}
+                                {% if datetime.now(timezone.utc) >= unlock_dt %}
+                                    <div class="badge badge-success">Unlocked</div>
+                                {% else %}
+                                    <div class="badge badge-warning">Locked</div>
+                                {% endif %}
+                            </h2>
+                            <p class="text-sm opacity-70 mt-2">
+                                Created: {{ waitbin.created_at.strftime('%Y-%m-%d %H:%M UTC') }}
+                            </p>
+                            <p class="text-sm opacity-70">
+                                Unlocks: {{ unlock_dt.strftime('%Y-%m-%d %H:%M UTC') }}
+                            </p>
+                            <p class="mt-2 line-clamp-2">
+                                {{ waitbin.content[:100] }}{% if waitbin.content|length > 100 %}...{% endif %}
+                            </p>
+                        </div>
+                        <div class="card-actions">
+                            <a href="{{ url_for('view_waitbin', waitbin_id=waitbin._id) }}" 
+                               class="btn btn-primary btn-sm">View</a>
+                            <a href="{{ url_for('edit_form', waitbin_id=waitbin._id) }}" 
+                               class="btn btn-outline btn-sm">Edit</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-16">
+            <h2 class="text-2xl font-bold mb-4 opacity-70">No WaitBins yet</h2>
+            <p class="mb-8 opacity-60">Create your first time-locked paste bin!</p>
+            <a href="{{ url_for('create') }}" class="btn btn-primary btn-lg">Create WaitBin</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

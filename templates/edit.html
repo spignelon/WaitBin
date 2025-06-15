@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Edit WaitBin{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8 text-center">Edit WaitBin</h1>
+    
+    <form method="POST" class="space-y-6">
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Title</span>
+            </label>
+            <input type="text" name="title" value="{{ waitbin.title or '' }}" 
+                   placeholder="Enter a title for your WaitBin" 
+                   class="input input-bordered w-full" />
+        </div>
+        
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Content</span>
+            </label>
+            <textarea name="content" class="textarea textarea-bordered h-32 w-full" 
+                      required>{{ waitbin.content }}</textarea>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Unlock Date</span>
+                </label>
+                <input type="date" name="unlock_date" 
+                       value="{{ waitbin.unlock_datetime.strftime('%Y-%m-%d') }}"
+                       class="input input-bordered w-full" 
+                       min="{{ datetime.now().date().isoformat() }}" required />
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Unlock Time</span>
+                </label>
+                <input type="time" name="unlock_time" 
+                       value="{{ waitbin.unlock_datetime.strftime('%H:%M') }}"
+                       class="input input-bordered w-full" />
+            </div>
+        </div>
+        
+        <div class="form-control mt-8">
+            <button type="submit" class="btn btn-primary btn-lg w-full">
+                Update WaitBin
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

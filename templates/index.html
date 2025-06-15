@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero min-h-[60vh]">
+    <div class="hero-content text-center">
+        <div class="max-w-md">
+            <h1 class="text-5xl font-bold mb-6">WaitBin</h1>
+            <p class="text-lg mb-8 opacity-80">
+                Create time-locked paste bins that unlock at a specific date and time. 
+                Perfect for surprises, scheduled announcements, or future messages.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{{ url_for('create') }}" class="btn btn-primary btn-lg">
+                    Create WaitBin
+                </a>
+                {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('register') }}" class="btn btn-outline btn-lg">
+                        Sign Up
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid md:grid-cols-3 gap-8 mt-16">
+    <div class="card bg-base-200 shadow-xl">
+        <div class="card-body text-center">
+            <h2 class="card-title justify-center">🔒 Time-Locked</h2>
+            <p>Content remains hidden until your specified date and time arrives.</p>
+        </div>
+    </div>
+    
+    <div class="card bg-base-200 shadow-xl">
+        <div class="card-body text-center">
+            <h2 class="card-title justify-center">🔗 Shareable</h2>
+            <p>Get a unique link to share with anyone. They'll see the countdown until unlock.</p>
+        </div>
+    </div>
+    
+    <div class="card bg-base-200 shadow-xl">
+        <div class="card-body text-center">
+            <h2 class="card-title justify-center">✏️ Editable</h2>
+            <p>Use edit codes or create an account to manage and modify your WaitBins.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

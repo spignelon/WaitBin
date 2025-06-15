@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Edit WaitBin{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <h1 class="text-3xl font-bold mb-8 text-center">Edit WaitBin</h1>
+    
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <form method="POST">
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text">Edit Code</span>
+                    </label>
+                    <input type="text" name="edit_code" placeholder="Enter your edit code" 
+                           class="input input-bordered w-full" required />
+                    <div class="label">
+                        <span class="label-text-alt opacity-70">
+                            Enter the edit code you received when creating this WaitBin
+                        </span>
+                    </div>
+                </div>
+                
+                <button type="submit" name="action" value="edit" class="btn btn-primary w-full">
+                    Verify & Edit
+                </button>
+            </form>
+            
+            {% if current_user.is_authenticated %}
+            <div class="divider">OR</div>
+            <div class="text-center">
+                <p class="text-sm opacity-70 mb-2">Don't have the edit code?</p>
+                <p class="text-xs opacity-60">Only WaitBins created while logged in can be edited without a code.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

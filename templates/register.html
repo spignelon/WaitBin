@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - WaitBin{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <h1 class="text-3xl font-bold mb-8 text-center">Sign Up</h1>
+    
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <form method="POST" class="space-y-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Username</span>
+                    </label>
+                    <input type="text" name="username" placeholder="Choose a username" 
+                           class="input input-bordered w-full" required />
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Email</span>
+                    </label>
+                    <input type="email" name="email" placeholder="Enter your email" 
+                           class="input input-bordered w-full" required />
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Full Name</span>
+                    </label>
+                    <input type="text" name="full_name" placeholder="Enter your full name" 
+                           class="input input-bordered w-full" required />
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Password</span>
+                    </label>
+                    <input type="password" name="password" placeholder="Choose a password" 
+                           class="input input-bordered w-full" required />
+                </div>
+                
+                <div class="form-control mt-6">
+                    <button type="submit" class="btn btn-primary w-full">Sign Up</button>
+                </div>
+            </form>
+            
+            <div class="divider">OR</div>
+            
+            <div class="text-center">
+                <p class="text-sm opacity-70">Already have an account?</p>
+                <a href="{{ url_for('login') }}" class="link link-primary">Login here</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

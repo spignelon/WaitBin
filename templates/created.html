@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}WaitBin Created{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center">
+    <div class="alert alert-success mb-8">
+        <span class="text-lg">🎉 WaitBin created successfully!</span>
+    </div>
+    
+    <div class="card bg-base-200 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title justify-center mb-4">Your WaitBin Link</h2>
+            
+            <div class="form-control mb-4">
+                <div class="input-group">
+                    <input type="text" id="waitbin-url" 
+                           value="{{ request.url_root }}w/{{ waitbin_id }}" 
+                           class="input input-bordered flex-1" readonly />
+                    <button class="btn btn-primary" onclick="copyToClipboard()">Copy</button>
+                </div>
+            </div>
+            
+            {% if show_edit_code %}
+            <div class="alert alert-info mb-6">
+                <div class="w-full">
+                    <h3 class="font-bold text-lg mb-2">🔑 Important: Save your edit code!</h3>
+                    <p class="text-sm mb-3 opacity-90">You'll need this code to edit your WaitBin later since you're not logged in.</p>
+                    <div class="bg-base-100 p-4 rounded-lg border-2 border-info/20">
+                        <div class="flex items-center justify-between">
+                            <code class="text-lg font-mono font-bold text-primary select-all">{{ edit_code }}</code>
+                            <button class="btn btn-sm btn-primary" onclick="copyEditCode()">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-xs mt-2 opacity-70">💡 Tip: Create an account to manage your WaitBins without edit codes!</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="card-actions justify-center mt-6">
+                <a href="{{ url_for('view_waitbin', waitbin_id=waitbin_id) }}" class="btn btn-primary">
+                    View WaitBin
+                </a>
+                <a href="{{ url_for('create') }}" class="btn btn-outline">
+                    Create Another
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const urlInput = document.getElementById('waitbin-url');
+    urlInput.select();
+    document.execCommand('copy');
+    
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => {
+        btn.textContent = originalText;
+    }, 2000);
+}
+
+function copyEditCode() {
+    const editCode = '{{ edit_code }}';
+    navigator.clipboard.writeText(editCode).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => {
+            btn.textContent = originalText;
+        }, 2000);
+    });
+}
+</script>
+{% endblock %}
