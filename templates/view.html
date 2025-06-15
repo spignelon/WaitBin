@@ -92,32 +92,46 @@ function copyContent() {
     });
 }
 {% else %}
+// Get the unlock time from the server (in UTC)
+const unlockTime = new Date('{{ waitbin.unlock_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') }}');
+let countdownInterval;
+
 function updateCountdown() {
-    fetch(`/api/time-remaining/{{ waitbin._id }}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.unlocked) {
-                location.reload();
-                return;
-            }
-            
-            const seconds = data.seconds_remaining;
-            const days = Math.floor(seconds / (24 * 60 * 60));
-            const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
-            const minutes = Math.floor((seconds % (60 * 60)) / 60);
-            const secs = seconds % 60;
-            
-            document.getElementById('days').textContent = days;
-            document.getElementById('hours').textContent = hours;
-            document.getElementById('minutes').textContent = minutes;
-            document.getElementById('seconds').textContent = secs;
-        })
-        .catch(error => console.error('Error:', error));
+    const now = new Date();
+    const timeRemaining = unlockTime - now;
+    
+    // If time has passed, reload the page to show unlocked content
+    if (timeRemaining <= 0) {
+        clearInterval(countdownInterval);
+        location.reload();
+        return;
+    }
+    
+    // Calculate time components
+    const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+    
+    // Update the display
+    document.getElementById('days').textContent = days;
+    document.getElementById('hours').textContent = hours;
+    document.getElementById('minutes').textContent = minutes;
+    document.getElementById('seconds').textContent = seconds;
 }
 
-// Update countdown every second
-updateCountdown();
-setInterval(updateCountdown, 1000);
+// Start the countdown
+document.addEventListener('DOMContentLoaded', function() {
+    updateCountdown(); // Update immediately
+    countdownInterval = setInterval(updateCountdown, 1000); // Then update every second
+});
+
+// Clean up interval when page is unloaded
+window.addEventListener('beforeunload', function() {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+});
 {% endif %}
 </script>
 {% endblock %}
