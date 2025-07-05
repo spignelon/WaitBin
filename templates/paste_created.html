@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Paste Created{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center">
+    <div class="alert alert-success mb-8">
+        <span class="text-lg">🎉 Paste created successfully!</span>
+    </div>
+    
+    <div class="card bg-base-200 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title justify-center mb-4">Your Paste URL</h2>
+            
+            <div class="form-control mb-4">
+                <div class="input-group">
+                    <input type="text" id="paste-url" 
+                           value="{{ paste_url }}" 
+                           class="input input-bordered flex-1" readonly />
+                    <button class="btn btn-primary" onclick="copyToClipboard()">Copy</button>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mb-6">
+                <div class="w-full">
+                    <h3 class="font-bold text-lg mb-2">📋 Important Notes</h3>
+                    <ul class="text-sm text-left list-disc list-inside space-y-1">
+                        <li>This paste cannot be edited once created</li>
+                        <li>The content will be displayed as plain text</li>
+                        <li>The paste endpoint is: <code>/paste/{{ endpoint }}</code></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card-actions justify-center mt-6">
+                <a href="{{ paste_url }}" class="btn btn-primary" target="_blank">
+                    View Paste
+                </a>
+                <a href="{{ url_for('pastebin') }}" class="btn btn-outline">
+                    Create Another
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const urlInput = document.getElementById('paste-url');
+    urlInput.select();
+    document.execCommand('copy');
+    
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => {
+        btn.textContent = originalText;
+    }, 2000);
+}
+</script>
+{% endblock %}

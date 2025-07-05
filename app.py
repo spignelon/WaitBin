@@ -25,6 +25,8 @@ client = MongoClient(os.environ.get('MONGODB_URI', 'mongodb://localhost:27017/')
 db = client.waitbin
 users_collection = db.users
 waitbins_collection = db.waitbins
+pastebin_codes_collection = db.pastebin_codes
+pastebins_collection = db.pastebins
 
 # Flask-Login setup
 login_manager = LoginManager()
@@ -59,6 +61,14 @@ def load_user(user_id):
 
 def generate_edit_code():
     return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
+
+def generate_random_endpoint():
+    """Generate a random 5-letter lowercase endpoint"""
+    return ''.join(secrets.choice(string.ascii_lowercase) for _ in range(5))
+
+def check_pastebin_code(code):
+    """Check if the provided code exists in pastebin_codes collection"""
+    return pastebin_codes_collection.find_one({'code': code}) is not None
 
 def check_edit_permission(waitbin, edit_code=None):
     """Check if current user can edit the waitbin"""
@@ -303,6 +313,70 @@ def api_time_remaining(waitbin_id):
         'unlocked': False,
         'seconds_remaining': int(time_remaining.total_seconds())
     })
+
+@app.route('/paste', methods=['GET', 'POST'])
+def pastebin():
+    if request.method == 'POST':
+        secret_code = request.form.get('secret_code', '').strip()
+        content = request.form.get('content', '').strip()
+        custom_endpoint = request.form.get('custom_endpoint', '').strip().lower()
+        
+        if not secret_code or not content:
+            flash('Secret code and content are required!', 'error')
+            return render_template('pastebin.html', 
+                                 content=content, 
+                                 custom_endpoint=custom_endpoint,
+                                 secret_code=secret_code)
+        
+        # Check if secret code is valid
+        if not check_pastebin_code(secret_code):
+            flash('Invalid secret code!', 'error')
+            return render_template('pastebin.html', 
+                                 content=content, 
+                                 custom_endpoint=custom_endpoint,
+                                 secret_code=secret_code)
+        
+        # Determine endpoint
+        if custom_endpoint:
+            # Check if custom endpoint already exists
+            if pastebins_collection.find_one({'endpoint': custom_endpoint}):
+                flash('Endpoint already exists! Please choose a different one.', 'error')
+                return render_template('pastebin.html', 
+                                     content=content, 
+                                     custom_endpoint=custom_endpoint,
+                                     secret_code=secret_code)
+            endpoint = custom_endpoint
+        else:
+            # Generate random endpoint
+            endpoint = generate_random_endpoint()
+            # Keep generating until we find an unused one
+            while pastebins_collection.find_one({'endpoint': endpoint}):
+                endpoint = generate_random_endpoint()
+        
+        # Create paste
+        paste_data = {
+            'endpoint': endpoint,
+            'content': content,
+            'created_at': datetime.now(timezone.utc)
+        }
+        
+        pastebins_collection.insert_one(paste_data)
+        
+        paste_url = url_for('view_paste', paste_endpoint=endpoint, _external=True)
+        return render_template('paste_created.html', paste_url=paste_url, endpoint=endpoint)
+    
+    return render_template('pastebin.html')
+
+@app.route('/paste/<paste_endpoint>')
+def view_paste(paste_endpoint):
+    paste = pastebins_collection.find_one({'endpoint': paste_endpoint})
+    
+    if not paste:
+        abort(404)
+    
+    # Return plain text response
+    from flask import Response
+    return Response(paste['content'], mimetype='text/plain')
 
 if __name__ == '__main__':
     app.run(debug=True)
