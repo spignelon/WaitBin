@@ -357,7 +357,8 @@ def pastebin():
         paste_data = {
             'endpoint': endpoint,
             'content': content,
-            'created_at': datetime.now(timezone.utc)
+            'created_at': datetime.now(timezone.utc),
+            'created_by': secret_code
         }
         
         pastebins_collection.insert_one(paste_data)
