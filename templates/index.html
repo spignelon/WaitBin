@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="hero min-h-[60vh]">
-    <div class="hero-content text-center">
+<div class="hero min-h-[50vh]">
+    <div class="hero-content text-center pt-0">
         <div class="max-w-md">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="WaitBin Logo" class="mx-auto mb-4 max-w-28 h-auto">
             <h1 class="text-5xl font-bold mb-6">WaitBin</h1>
             <p class="text-lg mb-8 opacity-80">
                 Create time-locked paste bins that unlock at a specific date and time. 
