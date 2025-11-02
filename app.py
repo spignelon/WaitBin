@@ -364,7 +364,11 @@ def pastebin():
         pastebins_collection.insert_one(paste_data)
         
         paste_url = url_for('view_paste', paste_endpoint=endpoint, _external=True)
-        return render_template('paste_created.html', paste_url=paste_url, endpoint=endpoint)
+        paste_md_url = url_for('view_paste_markdown', paste_endpoint=endpoint, _external=True)
+        return render_template('paste_created.html', 
+                             paste_url=paste_url, 
+                             paste_md_url=paste_md_url,
+                             endpoint=endpoint)
     
     return render_template('pastebin.html')
 
@@ -378,6 +382,18 @@ def view_paste(paste_endpoint):
     # Return plain text response
     from flask import Response
     return Response(paste['content'], mimetype='text/plain')
+
+@app.route('/paste-md/<paste_endpoint>')
+def view_paste_markdown(paste_endpoint):
+    paste = pastebins_collection.find_one({'endpoint': paste_endpoint})
+    
+    if not paste:
+        abort(404)
+    
+    # Pass raw content to frontend for client-side rendering
+    return render_template('paste_markdown.html', 
+                         endpoint=paste_endpoint,
+                         raw_content=paste['content'])
 
 if __name__ == '__main__':
     app.run(debug=True)

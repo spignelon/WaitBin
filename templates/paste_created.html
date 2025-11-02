@@ -10,14 +10,31 @@
     
     <div class="card bg-base-200 shadow-xl">
         <div class="card-body">
-            <h2 class="card-title justify-center mb-4">Your Paste URL</h2>
+            <h2 class="card-title justify-center mb-4">Your Paste URLs</h2>
             
-            <div class="form-control mb-4">
-                <div class="input-group">
-                    <input type="text" id="paste-url" 
-                           value="{{ paste_url }}" 
-                           class="input input-bordered flex-1" readonly />
-                    <button class="btn btn-primary" onclick="copyToClipboard()">Copy</button>
+            <div class="space-y-4 mb-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">📄 Plain Text URL</span>
+                    </label>
+                    <div class="input-group">
+                        <input type="text" id="paste-url" 
+                               value="{{ paste_url }}" 
+                               class="input input-bordered flex-1 text-sm" readonly />
+                        <button class="btn btn-primary" onclick="copyToClipboard('paste-url', this)">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">📝 Markdown URL</span>
+                    </label>
+                    <div class="input-group">
+                        <input type="text" id="paste-md-url" 
+                               value="{{ paste_md_url }}" 
+                               class="input input-bordered flex-1 text-sm" readonly />
+                        <button class="btn btn-primary" onclick="copyToClipboard('paste-md-url', this)">Copy</button>
+                    </div>
                 </div>
             </div>
             
@@ -26,15 +43,19 @@
                     <h3 class="font-bold text-lg mb-2">📋 Important Notes</h3>
                     <ul class="text-sm text-left list-disc list-inside space-y-1">
                         <li>This paste cannot be edited once created</li>
-                        <li>The content will be displayed as plain text</li>
+                        <li>Plain text URL shows raw content</li>
+                        <li>Markdown URL renders the content as formatted HTML</li>
                         <li>The paste endpoint is: <code>/paste/{{ endpoint }}</code></li>
                     </ul>
                 </div>
             </div>
             
-            <div class="card-actions justify-center mt-6">
+            <div class="card-actions justify-center mt-6 gap-2">
                 <a href="{{ paste_url }}" class="btn btn-primary" target="_blank">
-                    View Paste
+                    📄 View Plain Text
+                </a>
+                <a href="{{ paste_md_url }}" class="btn btn-secondary" target="_blank">
+                    📝 View Markdown
                 </a>
                 <a href="{{ url_for('pastebin') }}" class="btn btn-outline">
                     Create Another
@@ -45,16 +66,15 @@
 </div>
 
 <script>
-function copyToClipboard() {
-    const urlInput = document.getElementById('paste-url');
+function copyToClipboard(inputId, button) {
+    const urlInput = document.getElementById(inputId);
     urlInput.select();
     document.execCommand('copy');
     
-    const btn = event.target;
-    const originalText = btn.textContent;
-    btn.textContent = 'Copied!';
+    const originalText = button.textContent;
+    button.textContent = 'Copied!';
     setTimeout(() => {
-        btn.textContent = originalText;
+        button.textContent = originalText;
     }, 2000);
 }
 </script>
