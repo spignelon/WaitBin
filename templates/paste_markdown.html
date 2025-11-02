@@ -9,8 +9,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
-<div class="max-w-6xl mx-auto px-4">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+<div class="max-w-6xl mx-auto px-0 sm:px-4">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 px-4 sm:px-0">
         <h1 class="text-3xl font-bold">Markdown View</h1>
         <div class="flex gap-2 flex-wrap">
             <a href="{{ url_for('view_paste', paste_endpoint=endpoint) }}" class="btn btn-sm btn-outline">
@@ -22,13 +22,13 @@
         </div>
     </div>
     
-    <div class="card bg-base-100 shadow-xl">
-        <div class="card-body p-6 sm:p-8" style="background-color: #0d1117;">
+    <div class="card bg-base-100 shadow-xl sm:rounded-lg rounded-none">
+        <div class="card-body p-4 sm:p-6 md:p-8" style="background-color: #0d1117;">
             <div id="markdown-content" class="markdown-body"></div>
         </div>
     </div>
     
-    <div class="mt-4 text-sm opacity-70 text-center">
+    <div class="mt-4 text-sm opacity-70 text-center px-4 sm:px-0">
         <p>Endpoint: <code>/paste-md/{{ endpoint }}</code></p>
     </div>
 </div>
