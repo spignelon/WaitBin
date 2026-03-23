@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}WaitBin - Time-locked Paste Bin{% endblock %}</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    {% block og_tags %}
+    <meta property="og:title" content="WaitBin - Time-locked Paste Bin">
+    <meta property="og:description" content="Create time-locked paste bins that unlock at a specific date and time. Perfect for surprises, scheduled announcements, or future messages.">
+    <meta property="og:image" content="{{ url_for('static', filename='logo.png', _external=True) }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="WaitBin">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="WaitBin - Time-locked Paste Bin">
+    <meta name="twitter:description" content="Create time-locked paste bins that unlock at a specific date and time.">
+    <meta name="twitter:image" content="{{ url_for('static', filename='logo.png', _external=True) }}">
+    {% endblock %}
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.24/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script>

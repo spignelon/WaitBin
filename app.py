@@ -372,14 +372,27 @@ def pastebin():
     
     return render_template('pastebin.html')
 
+BOT_USER_AGENTS = ['telegrambot', 'whatsapp', 'facebookexternalhit', 'twitterbot',
+                    'linkedinbot', 'slackbot', 'discordbot', 'googlebot', 'bingbot']
+
+def is_bot_request():
+    """Check if the request is from a social media or search bot crawler."""
+    ua = (request.headers.get('User-Agent') or '').lower()
+    return any(bot in ua for bot in BOT_USER_AGENTS)
+
 @app.route('/paste/<paste_endpoint>')
 def view_paste(paste_endpoint):
     paste = pastebins_collection.find_one({'endpoint': paste_endpoint})
-    
+
     if not paste:
         abort(404)
-    
-    # Return plain text response
+
+    # Serve HTML with OG tags to bot crawlers for URL previews
+    if is_bot_request():
+        preview = paste['content'][:200].replace('\n', ' ')
+        return render_template('paste_og.html', endpoint=paste_endpoint, preview=preview)
+
+    # Return plain text response for regular users
     from flask import Response
     return Response(paste['content'], mimetype='text/plain')
 

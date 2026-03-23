@@ -2,6 +2,25 @@
 
 {% block title %}{{ waitbin.title or 'WaitBin' }}{% endblock %}
 
+{% block og_tags %}
+{% set og_title = waitbin.title or 'WaitBin' %}
+{% if is_unlocked %}
+    {% set og_desc = waitbin.content[:200] | replace('\n', ' ') %}
+{% else %}
+    {% set og_desc = 'This content is time-locked and will unlock on ' ~ waitbin.unlock_datetime.strftime('%B %d, %Y at %H:%M UTC') ~ '.' %}
+{% endif %}
+<meta property="og:title" content="{{ og_title }}">
+<meta property="og:description" content="{{ og_desc }}">
+<meta property="og:image" content="{{ url_for('static', filename='logo.png', _external=True) }}">
+<meta property="og:url" content="{{ request.url }}">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="WaitBin">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ og_title }}">
+<meta name="twitter:description" content="{{ og_desc }}">
+<meta name="twitter:image" content="{{ url_for('static', filename='logo.png', _external=True) }}">
+{% endblock %}
+
 {% block content %}
 <div class="max-w-4xl mx-auto">
     {% if is_unlocked %}

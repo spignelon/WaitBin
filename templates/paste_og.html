@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Paste - {{ endpoint }} | WaitBin</title>
+    <meta property="og:title" content="Paste - {{ endpoint }}">
+    <meta property="og:description" content="{{ preview }}">
+    <meta property="og:image" content="{{ url_for('static', filename='logo.png', _external=True) }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="WaitBin">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Paste - {{ endpoint }}">
+    <meta name="twitter:description" content="{{ preview }}">
+    <meta name="twitter:image" content="{{ url_for('static', filename='logo.png', _external=True) }}">
+</head>
+<body>
+    <p>{{ preview }}</p>
+</body>
+</html>
