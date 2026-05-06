@@ -35,10 +35,10 @@
             </label>
             <div class="input-group">
                 <span class="bg-base-200 px-3 py-2 border border-r-0 border-base-300 rounded-l-lg">/paste/</span>
-                <input type="text" name="custom_endpoint" placeholder="hello" 
+                <input type="text" name="custom_endpoint" placeholder="my-paste_v1"
                        value="{{ custom_endpoint or '' }}"
-                       class="input input-bordered flex-1 rounded-l-none" 
-                       pattern="[a-z0-9]+" title="Only lowercase letters and numbers allowed" />
+                       class="input input-bordered flex-1 rounded-l-none"
+                       pattern="[a-zA-Z0-9_\-]+" title="Letters, numbers, hyphens, and underscores only" />
             </div>
             <div class="label">
                 <span class="label-text-alt opacity-70">
@@ -56,9 +56,8 @@
 </div>
 
 <script>
-// Ensure custom endpoint is lowercase and alphanumeric only
 document.querySelector('input[name="custom_endpoint"]').addEventListener('input', function(e) {
-    e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '');
+    e.target.value = e.target.value.replace(/[^a-zA-Z0-9_\-]/g, '');
 });
 </script>
 {% endblock %}

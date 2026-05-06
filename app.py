@@ -5,6 +5,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from datetime import datetime, timezone
 import os
+import re
 import secrets
 import string
 from dotenv import load_dotenv
@@ -319,30 +320,36 @@ def pastebin():
     if request.method == 'POST':
         secret_code = request.form.get('secret_code', '').strip()
         content = request.form.get('content', '').strip()
-        custom_endpoint = request.form.get('custom_endpoint', '').strip().lower()
-        
+        custom_endpoint = request.form.get('custom_endpoint', '').strip()
+
         if not secret_code or not content:
             flash('Secret code and content are required!', 'error')
-            return render_template('pastebin.html', 
-                                 content=content, 
+            return render_template('pastebin.html',
+                                 content=content,
                                  custom_endpoint=custom_endpoint,
                                  secret_code=secret_code)
-        
+
         # Check if secret code is valid
         if not check_pastebin_code(secret_code):
             flash('Invalid secret code!', 'error')
-            return render_template('pastebin.html', 
-                                 content=content, 
+            return render_template('pastebin.html',
+                                 content=content,
                                  custom_endpoint=custom_endpoint,
                                  secret_code=secret_code)
-        
+
         # Determine endpoint
         if custom_endpoint:
-            # Check if custom endpoint already exists
-            if pastebins_collection.find_one({'endpoint': custom_endpoint}):
+            if not re.fullmatch(r'[a-zA-Z0-9_-]+', custom_endpoint):
+                flash('Custom endpoint may only contain letters, numbers, hyphens, and underscores.', 'error')
+                return render_template('pastebin.html',
+                                     content=content,
+                                     custom_endpoint=custom_endpoint,
+                                     secret_code=secret_code)
+            # Case-insensitive duplicate check
+            if pastebins_collection.find_one({'endpoint': {'$regex': f'^{re.escape(custom_endpoint)}$', '$options': 'i'}}):
                 flash('Endpoint already exists! Please choose a different one.', 'error')
-                return render_template('pastebin.html', 
-                                     content=content, 
+                return render_template('pastebin.html',
+                                     content=content,
                                      custom_endpoint=custom_endpoint,
                                      secret_code=secret_code)
             endpoint = custom_endpoint
